@@ -15,6 +15,8 @@ from reportlab.pdfgen import canvas
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import agreement_pages  # noqa: E402
+import apex  # noqa: E402
+import cover  # noqa: E402
 import front_pages  # noqa: E402
 from brand import PAGE_H, PAGE_W  # noqa: E402
 from layout import footer, header  # noqa: E402
@@ -59,12 +61,20 @@ def build(out_path=DEFAULT_OUT):
     c.setSubject("Traditional IRA • Roth IRA — application, fee schedule, "
                  "custodial agreements and disclosures")
 
+    # the watermark is defined once and stamped per page, so the outline costs
+    # a few KB rather than repeating on all 30-odd pages
+    apex.register(c)
+
     back = agreement_pages.build_back_pages()
     total = len(FRONT_RENDERERS) + len(back)
+
+    cover.render(c)
+    c.showPage()
 
     page_no = 0
     for i, render in enumerate(FRONT_RENDERERS):
         page_no += 1
+        apex.stamp(c)
         eyebrow, title, section, rev = FRONT_CHROME[i]
         header(c, eyebrow, title, FRONT_SUBTITLE[i])
         render(c)
@@ -73,6 +83,7 @@ def build(out_path=DEFAULT_OUT):
 
     for page in back:
         page_no += 1
+        apex.stamp(c)
         header(c, page.eyebrow, page.title, page.subtitle)
         page.render(c)
         footer(c, page_no, total, page.section, page.revision)

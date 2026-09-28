@@ -31,6 +31,10 @@ from brand import (
     SANS_B,
     SANS_BO,
     SANS_O,
+    SERIF,
+    SERIF_B,
+    SERIF_BI,
+    SERIF_I,
     WASH,
     WASH_GOLD,
     WHITE,
@@ -133,11 +137,17 @@ def gradient_rule(c, x, y, width, height=2.0, c1=GOLD_LIGHT, c2=BRONZE_DEEP, ste
         c.rect(x + i * seg, y, seg + 0.4, height, stroke=0, fill=1)
 
 
+def hairline(c, x, y, width, color=RULE, lw=0.5):
+    c.setStrokeColor(color)
+    c.setLineWidth(lw)
+    c.line(x, y, x + width, y)
+
+
 def header(c, eyebrow, title, subtitle=None):
-    """Logo left, document title right, gold gradient hairline underneath."""
-    logo_h = 26.0
+    """Wordmark left, document title right, a graded gold rule beneath both."""
+    logo_h = 25.0
     logo_w = logo_h * LOGO_ASPECT
-    top = PAGE_H - 30.0
+    top = PAGE_H - 32.0
     c.drawImage(
         LOGO, MARGIN_L, top - logo_h, width=logo_w, height=logo_h,
         mask="auto", preserveAspectRatio=True, anchor="sw",
@@ -145,55 +155,58 @@ def header(c, eyebrow, title, subtitle=None):
 
     right = PAGE_W - MARGIN_R
     if eyebrow:
-        w = tracked_width(eyebrow, SANS_B, 6.2, 1.5)
-        tracked(c, right - w, top - 8.0, eyebrow, SANS_B, 6.2, GOLD, 1.5)
+        w = tracked_width(eyebrow, SERIF, 6.0, 2.0)
+        tracked(c, right - w, top - 7.0, eyebrow, SERIF, 6.0, GOLD, 2.0)
     if title:
-        w = tracked_width(title, SANS, 8.4, 0.7)
-        tracked(c, right - w, top - 20.0, title, SANS, 8.4, INK_SOFT, 0.7)
+        w = tracked_width(title, SERIF, 9.6, 0.5)
+        tracked(c, right - w, top - 20.0, title, SERIF, 9.6, INK_SOFT, 0.5)
     if subtitle:
-        w = stringWidth(subtitle, SANS, 7.0)
-        c.setFont(SANS, 7.0)
+        w = stringWidth(subtitle, SERIF_I, 7.4)
+        c.setFont(SERIF_I, 7.4)
         c.setFillColor(GRAY)
-        c.drawString(right - w, top - 30.0, subtitle)
+        c.drawString(right - w, top - 30.5, subtitle)
 
-    gradient_rule(c, MARGIN_L, PAGE_H - 70.0, CONTENT_W, 1.6)
+    # a graded rule over a hairline - the engraved double rule of a certificate
+    gradient_rule(c, MARGIN_L, PAGE_H - 68.0, CONTENT_W, 1.2)
+    hairline(c, MARGIN_L, PAGE_H - 71.6, CONTENT_W, alpha(GOLD, 0.35), 0.4)
 
 
 def footer(c, page_no, page_total, section_label, revision):
     y = 30.0
-    c.setStrokeColor(RULE)
-    c.setLineWidth(0.5)
-    c.line(MARGIN_L, y + 13.0, PAGE_W - MARGIN_R, y + 13.0)
+    hairline(c, MARGIN_L, y + 15.0, CONTENT_W, alpha(RULE, 0.9), 0.4)
 
-    c.setFont(SANS, 6.4)
+    c.setFont(SERIF_I, 7.0)
     c.setFillColor(GRAY)
-    c.drawString(MARGIN_L, y + 3.0, f"{section_label}  •  {revision}")
+    c.drawString(MARGIN_L, y + 4.0, f"{section_label}   \u2014   {revision}")
 
     right = PAGE_W - MARGIN_R
-    label = f"Page {page_no} of {page_total}"
-    c.setFont(SANS_B, 6.4)
+    c.setFont(SERIF, 7.2)
     c.setFillColor(BRONZE_DEEP)
-    c.drawRightString(right, y + 3.0, label)
+    c.drawRightString(right, y + 4.0, f"{page_no} of {page_total}")
 
-    c.setFont(SANS, 6.0)
-    c.setFillColor(GRAY)
-    c.drawCentredString(PAGE_W / 2.0, y - 7.0,
-                        "Fortuity Inc  •  Custodial services provided by Digital Trust")
+    label = "FORTUITY INC   \u00b7   CUSTODIAL SERVICES BY DIGITAL TRUST"
+    w = tracked_width(label, SERIF, 5.8, 1.1)
+    tracked(c, (PAGE_W - w) / 2.0, y - 7.0, label, SERIF, 5.8,
+            alpha(GRAY, 0.85), 1.1)
 
 
 def contact_strip(c, y):
-    """Custodian contact line used on the cover-style pages."""
+    """Custodian contact line: hairline-ruled rather than boxed in."""
     from brand import CUSTODIAN_EMAIL, CUSTODIAN_FAX, CUSTODIAN_PHONE
 
-    c.setFillColor(WASH)
-    c.rect(MARGIN_L, y, CONTENT_W, 18.0, stroke=0, fill=1)
-    c.setFillColor(GOLD)
-    c.rect(MARGIN_L, y, 2.4, 18.0, stroke=0, fill=1)
-    c.setFont(SANS, 7.2)
-    c.setFillColor(INK_SOFT)
-    c.drawString(MARGIN_L + 12.0, y + 6.2,
-                 f"Phone  {CUSTODIAN_PHONE}      Fax  {CUSTODIAN_FAX}      "
-                 f"Email  {CUSTODIAN_EMAIL}")
+    hairline(c, MARGIN_L, y + 16.0, CONTENT_W, alpha(RULE, 0.9), 0.4)
+    hairline(c, MARGIN_L, y, CONTENT_W, alpha(RULE, 0.9), 0.4)
+
+    parts = [("Telephone", CUSTODIAN_PHONE), ("Facsimile", CUSTODIAN_FAX),
+             ("Email", CUSTODIAN_EMAIL)]
+    x = MARGIN_L
+    step = CONTENT_W / len(parts)
+    for label, value in parts:
+        w = tracked(c, x, y + 5.5, label.upper(), SERIF, 5.8, GOLD, 1.0)
+        c.setFont(SERIF, 7.6)
+        c.setFillColor(INK_SOFT)
+        c.drawString(x + w + 7.0, y + 5.5, value)
+        x += step
     return y
 
 
@@ -201,52 +214,56 @@ def contact_strip(c, y):
 # section furniture
 # ---------------------------------------------------------------------------
 
-def part_band(c, y, number, title, height=19.0):
-    """PART 1. ACCOUNT OWNER INFORMATION - espresso band with gold cap."""
+def part_band(c, y, number, title, height=21.0):
+    """PART 1. ACCOUNT OWNER INFORMATION - espresso band under a gold cap."""
+    import apex
+
     c.setFillColor(ESPRESSO)
     c.rect(MARGIN_L, y, CONTENT_W, height, stroke=0, fill=1)
-    gradient_rule(c, MARGIN_L, y + height - 2.0, CONTENT_W, 2.0)
+    gradient_rule(c, MARGIN_L, y + height - 1.6, CONTENT_W, 1.6)
 
-    x = MARGIN_L + 11.0
+    base = y + 7.0
+    x = MARGIN_L + 12.0
+    apex.glyph(c, x, base - 1.5, 10.0, GOLD_LIGHT, alpha=0.95)
+    x += 18.0
     if number:
-        w = tracked(c, x, y + 6.2, number, SANS_B, 8.0, GOLD_LIGHT, 1.0)
-        x += w + 9.0
-    tracked(c, x, y + 6.2, title, SANS_B, 8.0, WHITE, 1.4)
-    return y - 10.0
+        w = tracked(c, x, base, number, SERIF_B, 8.8, GOLD_LIGHT, 1.2)
+        x += w + 10.0
+    tracked(c, x, base, title, SERIF_B, 8.8, WHITE, 1.8)
+    return y - 12.0
 
 
-def section_head(c, y, title, size=9.0):
-    """Lighter heading used inside the agreements and disclosures."""
-    tracked(c, MARGIN_L, y, title, SANS_B, size, BRONZE_DEEP, 1.1)
-    c.setStrokeColor(alpha(GOLD, 0.55))
-    c.setLineWidth(0.7)
-    c.line(MARGIN_L, y - 4.5, PAGE_W - MARGIN_R, y - 4.5)
-    return y - 14.0
+def section_head(c, y, title, size=9.4):
+    """Lighter heading: tracked caps over a graded rule."""
+    tracked(c, MARGIN_L, y, title, SERIF_B, size, BRONZE_DEEP, 1.5)
+    gradient_rule(c, MARGIN_L, y - 5.5, CONTENT_W, 0.7,
+                  c1=alpha(GOLD, 0.75), c2=alpha(BRONZE_DEEP, 0.35))
+    return y - 17.0
 
 
-def callout(c, y, text, width=None, pad=8.0, size=7.0):
-    """The '!' notes from the source form, restyled as a gold-wash box."""
+def callout(c, y, text, width=None, pad=10.0, size=7.6):
+    """The '!' notes from the source form, restyled as a ruled gold wash."""
     width = width or CONTENT_W
-    inner = width - pad * 2 - 14.0
-    lines = wrap(text, SANS_O, size, inner)
-    height = pad * 2 + len(lines) * (size + 2.0) - 2.0
+    inner = width - pad * 2 - 16.0
+    lines = wrap(text, SERIF_I, size, inner)
+    height = pad * 2 + len(lines) * (size + 3.0) - 3.0
 
     c.setFillColor(WASH_GOLD)
     c.rect(MARGIN_L, y - height, width, height, stroke=0, fill=1)
     c.setFillColor(GOLD)
-    c.rect(MARGIN_L, y - height, 2.4, height, stroke=0, fill=1)
+    c.rect(MARGIN_L, y - height, 1.8, height, stroke=0, fill=1)
 
-    c.setFont(SANS_B, 9.0)
+    c.setFont(SERIF_B, 10.0)
     c.setFillColor(BRONZE_DEEP)
-    c.drawString(MARGIN_L + pad + 1.0, y - pad - size + 0.5, "!")
+    c.drawString(MARGIN_L + pad + 2.0, y - pad - size + 0.5, "!")
 
     ty = y - pad - size + 1.0
-    c.setFont(SANS_O, size)
+    c.setFont(SERIF_I, size)
     c.setFillColor(INK_SOFT)
     for ln in lines:
-        c.drawString(MARGIN_L + pad + 12.0, ty, ln)
-        ty -= size + 2.0
-    return y - height - 8.0
+        c.drawString(MARGIN_L + pad + 14.0, ty, ln)
+        ty -= size + 3.0
+    return y - height - 10.0
 
 
 # ---------------------------------------------------------------------------
@@ -256,8 +273,8 @@ def callout(c, y, text, width=None, pad=8.0, size=7.0):
 # A field occupies FIELD_H from the top of its row down to the rule; rows are
 # spaced FIELD_H + FIELD_GAP apart. Callers pass the TOP of the row, never the
 # rule, so a field row never backs into whatever sits above it.
-FIELD_H = 16.0
-FIELD_GAP = 13.0
+FIELD_H = 17.0
+FIELD_GAP = 15.0
 
 # Widget names have to be unique: two widgets sharing a name in an AcroForm
 # share a value, so the two "City" fields would fill in together.
@@ -282,14 +299,11 @@ def field(c, x, y, width, label, hint=None, fillable=True):
     created with no value, so the field opens blank in every reader.
     """
     rule_y = y - FIELD_H
-    c.setFont(SANS, 6.2)
-    c.setFillColor(GRAY)
-    c.drawString(x, y - 6.0, label.upper())
+    lw = tracked(c, x, y - 6.0, label.upper(), SERIF, 6.2, GRAY, 0.9)
     if hint:
-        c.setFont(SANS_O, 5.6)
-        c.setFillColor(alpha(GRAY, 0.75))
-        c.drawString(x + stringWidth(label.upper(), SANS, 6.2) + 4.0,
-                     y - 6.0, hint)
+        c.setFont(SERIF_I, 6.0)
+        c.setFillColor(alpha(GRAY, 0.8))
+        c.drawString(x + lw + 5.0, y - 6.0, hint)
     c.setStrokeColor(RULE)
     c.setLineWidth(0.7)
     c.line(x, rule_y, x + width, rule_y)
@@ -303,7 +317,7 @@ def field(c, x, y, width, label, hint=None, fillable=True):
             name=_field_name(label), value="", x=x + 1.0, y=rule_y + 1.5,
             width=max(width - 2.0, 10.0), height=11.0,
             borderWidth=0, forceBorder=False, borderStyle="underlined",
-            fillColor=None, textColor=INK, fontName=SANS, fontSize=8,
+            fillColor=None, textColor=INK, fontName=SERIF, fontSize=9,
             tooltip=f"{label}{' ' + hint if hint else ''}",
         )
     return rule_y
@@ -325,8 +339,8 @@ def field_row(c, y, specs, gap=12.0):
     return y - FIELD_H - FIELD_GAP
 
 
-def checkbox(c, x, y, size=8.0, label=None, label_font=SANS, label_size=7.4,
-             label_color=INK, gap=5.0, fillable=True):
+def checkbox(c, x, y, size=8.6, label=None, label_font=SERIF, label_size=8.4,
+             label_color=INK, gap=6.0, fillable=True):
     """An unchecked box. The widget is created with checked=False."""
     # The box is drawn on the page so it always prints, and the widget sits on
     # top of it borderless - a viewer that ignores form fields still shows a
@@ -362,7 +376,7 @@ def signature_row(c, y, name_label, date_label="Date", sig_label="Signature"):
     return y - FIELD_H - FIELD_GAP
 
 
-def pin_boxes(c, x, y, count=4, size=13.0, gap=4.0, fillable=True):
+def pin_boxes(c, x, y, count=4, size=14.0, gap=5.0, fillable=True):
     """Blank PIN boxes - one single-character widget per digit."""
     group = _field_name("pin")
     for i in range(count):
@@ -375,18 +389,18 @@ def pin_boxes(c, x, y, count=4, size=13.0, gap=4.0, fillable=True):
                 name=f"{group}_{i + 1}", value="", maxlen=1,
                 x=bx + 1.0, y=y + 1.0, width=size - 2.0, height=size - 2.0,
                 borderWidth=0, forceBorder=False, fillColor=None,
-                textColor=INK, fontName=SANS, fontSize=9,
+                textColor=INK, fontName=SERIF, fontSize=10,
                 tooltip=f"PIN digit {i + 1}",
             )
     return x + count * (size + gap)
 
 
-def body(c, y, text, size=7.4, leading=None, color=INK, font=SANS,
+def body(c, y, text, size=8.4, leading=None, color=INK, font=SERIF,
          width=None, x=None, align="left"):
     """Plain wrapped body copy. Returns the new y cursor."""
     width = width or CONTENT_W
     x = MARGIN_L if x is None else x
-    leading = leading or size + 2.6
+    leading = leading or size + 3.2
     c.setFont(font, size)
     c.setFillColor(color)
     for ln in wrap(text, font, size, width):
@@ -398,12 +412,12 @@ def body(c, y, text, size=7.4, leading=None, color=INK, font=SANS,
     return y
 
 
-def bullet(c, y, marker, text, x=None, width=None, size=7.4, leading=None,
-           marker_w=16.0, color=INK, marker_color=BRONZE_DEEP,
-           marker_font=SANS_B):
+def bullet(c, y, marker, text, x=None, width=None, size=8.4, leading=None,
+           marker_w=18.0, color=INK, marker_color=BRONZE_DEEP,
+           marker_font=SERIF_B):
     x = MARGIN_L if x is None else x
     width = width or (CONTENT_W - marker_w)
-    leading = leading or size + 2.6
+    leading = leading or size + 3.2
     c.setFont(marker_font, size)
     c.setFillColor(marker_color)
     c.drawString(x, y, marker)

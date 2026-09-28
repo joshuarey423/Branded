@@ -28,6 +28,9 @@ from brand import (
     SANS_B,
     SANS_BO,
     SANS_O,
+    SERIF,
+    SERIF_B,
+    SERIF_I,
     WASH,
     WASH_GOLD,
     WHITE,
@@ -57,41 +60,40 @@ TOP_CONT = PAGE_H - 92.0     # continuation page opening with a heading
 
 
 def _doc_title(c, y, title, subtitle):
-    tracked(c, MARGIN_L, y, title, SANS_B, 16.0, ESPRESSO, 2.2)
-    y -= 14.0
-    tracked(c, MARGIN_L, y, subtitle, SANS, 9.0, BRONZE_DEEP, 1.6)
-    return y - 16.0
+    tracked(c, MARGIN_L, y, title, SERIF_B, 17.0, ESPRESSO, 2.6)
+    y -= 17.0
+    tracked(c, MARGIN_L, y, subtitle, SERIF, 9.6, BRONZE_DEEP, 2.2)
+    return y - 18.0
 
 
 def _step_header(c, y, step, title):
     """STEP 1. OPEN YOUR ACCOUNT - numbered gold chip plus rule."""
-    size = 17.0
+    size = 19.0
     c.setFillColor(ESPRESSO)
-    c.rect(MARGIN_L, y - 3.0, size, size, stroke=0, fill=1)
-    c.setFont(SANS_B, 9.0)
+    c.rect(MARGIN_L, y - 4.0, size, size, stroke=0, fill=1)
+    c.setFont(SERIF_B, 10.0)
     c.setFillColor(GOLD_LIGHT)
-    c.drawCentredString(MARGIN_L + size / 2.0, y + 2.0, str(step))
+    c.drawCentredString(MARGIN_L + size / 2.0, y + 1.5, str(step))
 
-    x = MARGIN_L + size + 9.0
-    w = tracked(c, x, y + 2.0, title, SANS_B, 9.0, ESPRESSO, 1.5)
-    c.setStrokeColor(alpha(GOLD, 0.6))
-    c.setLineWidth(0.7)
-    c.line(x + w + 8.0, y + 5.5, PAGE_W - MARGIN_R, y + 5.5)
-    return y - 16.0
+    x = MARGIN_L + size + 11.0
+    w = tracked(c, x, y + 2.0, title, SERIF_B, 10.0, ESPRESSO, 2.0)
+    gradient_rule(c, x + w + 10.0, y + 4.5, PAGE_W - MARGIN_R - x - w - 10.0,
+                  0.7, c1=alpha(GOLD, 0.7), c2=alpha(BRONZE_DEEP, 0.3))
+    return y - 19.0
 
 
 def _check_item(c, y, text, sub=None, indent=0.0):
     x = MARGIN_L + 8.0 + indent
-    checkbox(c, x, y - 1.0, 8.0)
-    y2 = body(c, y, text, size=7.6, x=x + 14.0, width=CONTENT_W - 22.0 - indent)
+    checkbox(c, x, y - 2.0, 8.6)
+    y2 = body(c, y, text, size=8.4, x=x + 16.0, width=CONTENT_W - 24.0 - indent)
     if sub:
         for s in sub:
             c.setFillColor(GOLD)
-            c.circle(x + 20.0, y2 + 2.4, 1.3, stroke=0, fill=1)
-            y2 = body(c, y2, s, size=6.9, color=GRAY, x=x + 26.0,
-                      width=CONTENT_W - 36.0 - indent)
-        y2 -= 1.0
-    return y2 - 4.0
+            c.circle(x + 23.0, y2 + 2.6, 1.3, stroke=0, fill=1)
+            y2 = body(c, y2, s, size=7.6, color=GRAY, x=x + 29.0,
+                      width=CONTENT_W - 40.0 - indent)
+        y2 -= 2.0
+    return y2 - 5.0
 
 
 # ---------------------------------------------------------------------------
@@ -105,12 +107,12 @@ def page_instructions(c):
 
     y = body(c, y, "To ensure your account is established in a timely manner, verify "
                    "that the following items have been completed and submitted:",
-             size=7.6, color=INK_SOFT)
+             size=8.4, color=INK_SOFT)
     y -= 10.0
 
     y = _step_header(c, y, 1, "OPEN YOUR ACCOUNT")
     y -= 4.0
-    tracked(c, MARGIN_L + 8.0, y, "ACCOUNT CHECKLIST", SANS_B, 6.6, GRAY, 1.0)
+    tracked(c, MARGIN_L + 8.0, y, "ACCOUNT CHECKLIST", SERIF, 7.0, GRAY, 1.8)
     y -= 16.0
     for item in [
         "Self-Directed Account Application",
@@ -125,7 +127,7 @@ def page_instructions(c):
     y = _step_header(c, y, 2, "FUND YOUR ACCOUNT")
     y -= 4.0
     y = body(c, y, "Once your account has been successfully established, fund your "
-                   "account through one or more options:", size=7.4, color=GRAY)
+                   "account through one or more options:", size=8.2, color=GRAY)
     y -= 10.0
     y = _check_item(
         c, y, "New Contribution",
@@ -148,7 +150,7 @@ def page_instructions(c):
     y = body(c, y, "After your account has been funded, contact Digital Trust to "
                    "discuss your Direction of Investment — we’ll work with you to "
                    "ensure all necessary documents are completed to process your "
-                   "asset purchase.", size=7.6, color=INK_SOFT)
+                   "asset purchase.", size=8.4, color=INK_SOFT)
 
     # --- submit block, anchored above the footer ------------------------
     box_h = 82.0
@@ -159,27 +161,27 @@ def page_instructions(c):
 
     tx = MARGIN_L + 16.0
     ty = y - 22.0
-    tracked(c, tx, ty, "SUBMIT YOUR APPLICATION", SANS_B, 8.0, ESPRESSO, 1.4)
+    tracked(c, tx, ty, "SUBMIT YOUR APPLICATION", SERIF_B, 9.0, ESPRESSO, 2.0)
     ty -= 13.0
-    c.setFont(SANS, 7.0)
+    c.setFont(SERIF_I, 8.0)
     c.setFillColor(GRAY)
     c.drawString(tx, ty, "Verify all completed information and submit your "
                          "application to Digital Trust.")
 
     col = MARGIN_L + CONTENT_W * 0.06
     ty2 = y - 53.0
-    tracked(c, col, ty2, "VIA MAIL", SANS_B, 6.4, BRONZE_DEEP, 1.0)
-    c.setFont(SANS, 7.0)
+    tracked(c, col, ty2, "VIA MAIL", SERIF, 6.6, BRONZE_DEEP, 1.8)
+    c.setFont(SERIF, 8.0)
     c.setFillColor(INK)
-    c.drawString(col, ty2 - 11.0, "Digital Trust")
+    c.drawString(col, ty2 - 12.0, "Digital Trust")
     c.setFillColor(INK_SOFT)
-    c.drawString(col, ty2 - 20.0, CUSTODIAN_ADDRESS)
+    c.drawString(col, ty2 - 22.0, CUSTODIAN_ADDRESS)
 
     col2 = MARGIN_L + CONTENT_W * 0.62
-    tracked(c, col2, ty2, "VIA EMAIL", SANS_B, 6.4, BRONZE_DEEP, 1.0)
-    c.setFont(SANS, 7.0)
+    tracked(c, col2, ty2, "VIA EMAIL", SERIF, 6.6, BRONZE_DEEP, 1.8)
+    c.setFont(SERIF, 8.0)
     c.setFillColor(INK)
-    c.drawString(col2, ty2 - 11.0, CUSTODIAN_EMAIL)
+    c.drawString(col2, ty2 - 12.0, CUSTODIAN_EMAIL)
 
 
 # ---------------------------------------------------------------------------
@@ -195,10 +197,10 @@ def page_application_1(c):
     y -= 4.0
 
     # account type election
-    tracked(c, MARGIN_L, y, "TYPE OF ACCOUNT TO ESTABLISH", SANS_B, 6.6, GRAY, 1.0)
+    tracked(c, MARGIN_L, y, "TYPE OF ACCOUNT TO ESTABLISH", SERIF, 7.0, GRAY, 1.8)
     y -= 14.0
-    x = checkbox(c, MARGIN_L, y, 9.0, "Traditional IRA", SANS, 7.8)
-    checkbox(c, x + 30.0, y, 9.0, "Roth IRA", SANS, 7.8)
+    x = checkbox(c, MARGIN_L, y, 9.0, "Traditional IRA", SERIF, 8.6)
+    checkbox(c, x + 34.0, y, 9.0, "Roth IRA", SERIF, 8.6)
     y -= 16.0
     y = callout(c, y, "If no option is selected, this application will NOT be processed.")
 
@@ -217,7 +219,7 @@ def page_application_1(c):
 
     # PIN
     y -= 8.0
-    tracked(c, MARGIN_L, y, "PLEASE CREATE A 4-DIGIT PIN", SANS_B, 6.6, GRAY, 1.0)
+    tracked(c, MARGIN_L, y, "PLEASE CREATE A 4-DIGIT PIN", SERIF, 7.0, GRAY, 1.8)
     pin_boxes(c, MARGIN_L + 132.0, y - 4.0)
     y -= 24.0
     y = callout(c, y, "PIN numbers should be kept confidential as they can be used "
@@ -227,13 +229,13 @@ def page_application_1(c):
     y -= 6.0
     y = body(c, y, "Choose your preferred method for paying the fees associated with "
                    "your account. Refer to your Fee Schedule for all fees applicable "
-                   "to your account.", size=7.4, color=INK_SOFT)
+                   "to your account.", size=8.3, color=INK_SOFT)
     y -= 6.0
     checkbox(c, MARGIN_L, y - 1.0, 9.0,
-             "Deduct the fees due from the cash available in my account.", SANS, 7.8)
+             "Deduct the fees due from the cash available in my account.", SERIF, 8.6)
     y -= 15.0
     checkbox(c, MARGIN_L, y - 1.0, 9.0,
-             "Deduct fees using a Credit or Debit Card.", SANS, 7.8)
+             "Deduct fees using a Credit or Debit Card.", SERIF, 8.6)
     y -= 17.0
     y = callout(c, y, "If this option is selected, you will receive a secure link "
                       "upon signing to provide your card information.")
@@ -246,7 +248,7 @@ def page_application_1(c):
                    "reflect your IRA being the legal owner of the investments and "
                    "assets. Incorrect titling may cause delays in processing your "
                    "request or taxable consequences. The correct titling should be as "
-                   "follows:", size=7.0, color=GRAY)
+                   "follows:", size=7.9, color=GRAY)
     y -= 6.0
 
     box_h = 30.0
@@ -254,13 +256,13 @@ def page_application_1(c):
     c.rect(MARGIN_L, y - box_h, CONTENT_W, box_h, stroke=0, fill=1)
     c.setFillColor(GOLD)
     c.rect(MARGIN_L, y - box_h, 2.4, box_h, stroke=0, fill=1)
-    c.setFont(SANS_B, 8.0)
+    c.setFont(SERIF_B, 9.4)
     c.setFillColor(ESPRESSO)
-    c.drawString(MARGIN_L + 12.0, y - 13.0,
+    c.drawString(MARGIN_L + 14.0, y - 14.0,
                  "“Digital Trust FBO: (Your Name) (Account Type)”")
-    c.setFont(SANS_O, 7.0)
+    c.setFont(SERIF_I, 8.0)
     c.setFillColor(GRAY)
-    c.drawString(MARGIN_L + 12.0, y - 24.0,
+    c.drawString(MARGIN_L + 14.0, y - 26.0,
                  "Example:  Digital Trust FBO: Jane Doe Inherited Roth IRA")
 
 
@@ -273,18 +275,18 @@ def _yes_no_row(c, y, question):
     right_edge = PAGE_W - MARGIN_R
     no_x = right_edge - 36.0
     yes_x = no_x - 46.0
-    lines = wrap(question, SANS, 7.4, yes_x - MARGIN_L - 16.0)
+    lines = wrap(question, SERIF, 8.4, yes_x - MARGIN_L - 16.0)
 
-    ty = y - 9.0
-    c.setFont(SANS, 7.4)
+    ty = y - 10.0
+    c.setFont(SERIF, 8.4)
     c.setFillColor(INK)
     for ln in lines:
         c.drawString(MARGIN_L, ty, ln)
-        ty -= 9.8
-    checkbox(c, yes_x, y - 11.0, 8.5, "Yes", SANS, 7.4)
-    checkbox(c, no_x, y - 11.0, 8.5, "No", SANS, 7.4)
+        ty -= 11.0
+    checkbox(c, yes_x, y - 12.0, 8.6, "Yes", SERIF, 8.4)
+    checkbox(c, no_x, y - 12.0, 8.6, "No", SERIF, 8.4)
 
-    bottom = min(ty + 9.8 - 6.0, y - 22.0)
+    bottom = min(ty + 11.0 - 6.0, y - 24.0)
     c.setStrokeColor(RULE)
     c.setLineWidth(0.5)
     c.line(MARGIN_L, bottom, right_edge, bottom)
@@ -294,10 +296,10 @@ def _yes_no_row(c, y, question):
 def _beneficiary_block(c, y, index):
     """One blank beneficiary block. `y` is the top of the block."""
     ty = y - 8.0
-    tracked(c, MARGIN_L, ty, f"BENEFICIARY {index}.", SANS_B, 7.2, BRONZE_DEEP, 1.0)
-    x = MARGIN_L + 78.0
-    x = checkbox(c, x, ty - 1.5, 8.5, "Primary Beneficiary", SANS, 7.2)
-    checkbox(c, x + 16.0, ty - 1.5, 8.5, "Contingent Beneficiary", SANS, 7.2)
+    tracked(c, MARGIN_L, ty, f"BENEFICIARY {index}.", SERIF_B, 8.2, BRONZE_DEEP, 1.6)
+    x = MARGIN_L + 94.0
+    x = checkbox(c, x, ty - 2.0, 8.6, "Primary Beneficiary", SERIF, 8.2)
+    checkbox(c, x + 20.0, ty - 2.0, 8.6, "Contingent Beneficiary", SERIF, 8.2)
     c.setStrokeColor(alpha(GOLD, 0.5))
     c.setLineWidth(0.6)
     c.line(MARGIN_L, ty - 7.0, PAGE_W - MARGIN_R, ty - 7.0)
@@ -323,10 +325,10 @@ def page_application_2(c):
                    "married account owner list their spouse as the primary beneficiary "
                    "with a share percentage of 100%. Should the account owner choose to "
                    "list someone other than their spouse, spousal consent is required.",
-             size=7.2, color=INK_SOFT)
+             size=8.1, color=INK_SOFT)
     y -= 6.0
     y = body(c, y, "Please complete the questions below to determine if spousal "
-                   "consent is required:", size=7.2, color=GRAY)
+                   "consent is required:", size=8.1, color=GRAY)
     y -= 12.0
 
     y = _yes_no_row(c, y, "Are you currently married?")
@@ -348,7 +350,7 @@ def page_application_2(c):
                    "for the Account Owner to designate a beneficiary other than or in "
                    "addition to myself. I have been advised to consult a competent "
                    "legal or tax advisor prior to consenting to the beneficiary "
-                   "designation below.", size=7.0, color=INK_SOFT)
+                   "designation below.", size=7.9, color=INK_SOFT)
     y -= 14.0
     y = signature_row(c, y, "Spouse Name", sig_label="Signature of Spouse")
 
@@ -370,11 +372,11 @@ def page_application_2(c):
                    "states: AK, AZ, CA, ID, LA, NV, NM, TX, WA, or WI are subject to "
                    "the laws of community property requiring the account owner to list "
                    "their spouse as primary beneficiary with a share of 100% or obtain "
-                   "spousal consent.", size=6.9, color=INK_SOFT)
+                   "spousal consent.", size=7.8, color=INK_SOFT)
     y -= 8.0
     checkbox(c, MARGIN_L, y - 1.0, 9.0,
              "I elect not to designate beneficiaries at this time and understand that "
-             "I may designate beneficiaries at a later date.", SANS, 7.4)
+             "I may designate beneficiaries at a later date.", SERIF, 8.4)
     y -= 18.0
     y = callout(c, y, "The total share percentage for primary beneficiaries must total "
                       "100% and the total share percentage for contingent beneficiaries "
@@ -389,9 +391,9 @@ def page_application_2(c):
 def page_application_3(c):
     y = TOP_CONT
     tracked(c, MARGIN_L, y, "PART 4.  BENEFICIARY DESIGNATION",
-            SANS_B, 7.4, BRONZE_DEEP, 1.2)
-    tracked(c, PAGE_W - MARGIN_R - tracked_width("CONTINUED", SANS_B, 6.4, 1.2),
-            y, "CONTINUED", SANS_B, 6.4, GRAY, 1.2)
+            SERIF_B, 8.6, BRONZE_DEEP, 1.8)
+    tracked(c, PAGE_W - MARGIN_R - tracked_width("CONTINUED", SERIF, 7.0, 1.8),
+            y, "CONTINUED", SERIF, 7.0, GRAY, 1.8)
     c.setStrokeColor(alpha(GOLD, 0.6))
     c.setLineWidth(0.7)
     c.line(MARGIN_L, y - 5.0, PAGE_W - MARGIN_R, y - 5.0)
@@ -404,7 +406,7 @@ def page_application_3(c):
     y -= 6.0
     checkbox(c, MARGIN_L, y - 1.0, 9.0,
              "Check here if additional beneficiaries are listed on an attached "
-             "addendum.", SANS, 7.4)
+             "addendum.", SERIF, 8.4)
     x = MARGIN_L + 318.0
     # the field rule lands on the checkbox baseline, so pass the row top
     field(c, x, y + 15.0, PAGE_W - MARGIN_R - x,
@@ -445,7 +447,7 @@ def page_application_4(c):
     y -= 10.0
 
     tracked(c, MARGIN_L, y, "IMPORTANT: PLEASE READ BEFORE SIGNING.",
-            SANS_B, 8.6, ESPRESSO, 1.2)
+            SERIF_B, 9.6, ESPRESSO, 1.8)
     y -= 24.0
 
     y = section_head(c, y, "USA PATRIOT ACT", 7.6)
@@ -456,21 +458,21 @@ def page_application_4(c):
                    "when you open an account, we will request your name, address, date "
                    "of birth, a copy of your driver’s license or passport, and other "
                    "information that will help us to identify you.",
-             size=7.8, leading=11.0, color=INK_SOFT)
+             size=8.5, leading=12.0, color=INK_SOFT)
     y -= 24.0
 
     checkbox(c, MARGIN_L, y - 1.0, 9.0,
-             "I have reviewed the Digital Trust Fee Schedule.", SANS, 8.2)
+             "I have reviewed the Digital Trust Fee Schedule.", SERIF, 9.0)
     y -= 20.0
     checkbox(c, MARGIN_L, y - 1.0, 9.0,
              "I have reviewed the Digital Trust disclosures associated with opening "
-             "this account.", SANS, 8.2)
+             "this account.", SERIF, 9.0)
     y -= 30.0
 
     y = body(c, y, "By signing below, I certify that all information provided in this "
                    "Application is true and accurate. I understand the terms and "
                    "conditions that apply to this account and agree to be bound by "
-                   "them.", size=8.0, leading=11.4, color=INK)
+                   "them.", size=8.8, leading=12.4, color=INK)
     y -= 30.0
     y = signature_row(c, y, "IRA Owner Name", sig_label="Signature of IRA Owner")
 
@@ -485,8 +487,8 @@ def page_application_4(c):
     lh = 20.0
     c.drawImage(LOGO_KO, MARGIN_L + 16.0, y - 34.0, width=lh * LOGO_ASPECT,
                 height=lh, mask="auto", preserveAspectRatio=True, anchor="sw")
-    c.setFont(SANS, 6.8)
-    c.setFillColor(alpha(WHITE, 0.78))
+    c.setFont(SERIF, 7.6)
+    c.setFillColor(alpha(WHITE, 0.8))
     c.drawString(MARGIN_L + 16.0, y - 46.0,
                  "Submit to  " + CUSTODIAN_EMAIL + "   or   " + CUSTODIAN_ADDRESS)
 
@@ -550,24 +552,24 @@ ASSET_FEES = [
 ]
 
 
-def _fee_rows(c, y, rows, x, width, size=6.9):
+def _fee_rows(c, y, rows, x, width, size=7.7):
     for kind, label, amount in rows:
         if kind == "group":
-            y -= 2.0
-            tracked(c, x, y, label.upper(), SANS_B, 6.2, BRONZE_DEEP, 0.9)
-            y -= 10.0
+            y -= 4.0
+            tracked(c, x, y, label.upper(), SERIF, 6.8, BRONZE_DEEP, 1.6)
+            y -= 12.0
             continue
-        indent = 9.0 if kind == "sub" else 0.0
-        c.setFont(SANS_O if kind == "sub" else SANS, size)
+        indent = 11.0 if kind == "sub" else 0.0
+        c.setFont(SERIF_I if kind == "sub" else SERIF, size)
         c.setFillColor(GRAY if kind == "sub" else INK)
         c.drawString(x + indent, y, label)
-        c.setFont(SANS_B, size)
+        c.setFont(SERIF_B, size)
         c.setFillColor(ESPRESSO)
         c.drawRightString(x + width, y, amount)
         c.setStrokeColor(alpha(RULE, 0.8))
         c.setLineWidth(0.4)
-        c.line(x + indent, y - 3.2, x + width, y - 3.2)
-        y -= 11.4
+        c.line(x + indent, y - 3.8, x + width, y - 3.8)
+        y -= 13.0
     return y
 
 
@@ -583,40 +585,40 @@ def page_fee_schedule(c):
     # --- left column: account fees + asset purchase fees ---------------
     ly = y
     c.setFillColor(ESPRESSO)
-    c.rect(left_x, ly - 3.0, colw, 15.0, stroke=0, fill=1)
-    tracked(c, left_x + 8.0, ly + 1.5, "ACCOUNT FEES", SANS_B, 7.2, GOLD_LIGHT, 1.3)
-    ly -= 24.0
+    c.rect(left_x, ly - 4.0, colw, 17.0, stroke=0, fill=1)
+    tracked(c, left_x + 9.0, ly + 1.5, "ACCOUNT FEES", SERIF_B, 8.0, GOLD_LIGHT, 2.0)
+    ly -= 27.0
 
-    c.setFont(SANS, 6.9)
+    c.setFont(SERIF, 7.7)
     c.setFillColor(INK)
     c.drawString(left_x, ly, "Setup Fee  (One-Time)")
-    c.setFont(SANS_B, 6.9)
+    c.setFont(SERIF_B, 7.7)
     c.setFillColor(ESPRESSO)
     c.drawRightString(left_x + colw, ly, "$50")
     c.setStrokeColor(alpha(GOLD, 0.7))
     c.setLineWidth(0.6)
-    c.line(left_x, ly - 3.4, left_x + colw, ly - 3.4)
-    ly -= 14.0
+    c.line(left_x, ly - 3.8, left_x + colw, ly - 3.8)
+    ly -= 17.0
 
-    tracked(c, left_x, ly, "ANNUAL FEE", SANS_B, 6.2, GRAY, 0.9)
-    ly -= 12.0
+    tracked(c, left_x, ly, "ANNUAL FEE", SERIF, 6.8, GRAY, 1.6)
+    ly -= 13.0
     ly = _fee_rows(c, ly, ACCOUNT_FEES, left_x, colw)
 
     ly -= 12.0
     c.setFillColor(ESPRESSO)
-    c.rect(left_x, ly - 3.0, colw, 15.0, stroke=0, fill=1)
-    tracked(c, left_x + 8.0, ly + 1.5, "ASSET PURCHASE FEES", SANS_B, 7.2,
-            GOLD_LIGHT, 1.3)
-    ly -= 24.0
+    c.rect(left_x, ly - 4.0, colw, 17.0, stroke=0, fill=1)
+    tracked(c, left_x + 9.0, ly + 1.5, "ASSET PURCHASE FEES", SERIF_B, 8.0,
+            GOLD_LIGHT, 2.0)
+    ly -= 27.0
     ly = _fee_rows(c, ly, ASSET_FEES, left_x, colw)
 
     # --- right column: transaction fees --------------------------------
     ry = y
     c.setFillColor(ESPRESSO)
-    c.rect(right_x, ry - 3.0, colw, 15.0, stroke=0, fill=1)
-    tracked(c, right_x + 8.0, ry + 1.5, "TRANSACTION FEES", SANS_B, 7.2,
-            GOLD_LIGHT, 1.3)
-    ry -= 24.0
+    c.rect(right_x, ry - 4.0, colw, 17.0, stroke=0, fill=1)
+    tracked(c, right_x + 9.0, ry + 1.5, "TRANSACTION FEES", SERIF_B, 8.0,
+            GOLD_LIGHT, 2.0)
+    ry -= 27.0
     ry = _fee_rows(c, ry, [("row", a, b) for a, b in TRANSACTION_FEES],
                    right_x, colw)
 
@@ -637,14 +639,14 @@ def page_fee_schedule(c):
     ]
     lines = []
     for n in notes:
-        lines.extend(wrap(n, SANS, 5.9, CONTENT_W - 20.0))
-    box_h = len(lines) * 7.6 + 14.0
+        lines.extend(wrap(n, SERIF, 6.8, CONTENT_W - 24.0))
+    box_h = len(lines) * 8.8 + 18.0
     c.rect(MARGIN_L, fy - box_h, CONTENT_W, box_h, stroke=0, fill=1)
     c.setFillColor(GOLD)
     c.rect(MARGIN_L, fy - box_h, 2.4, box_h, stroke=0, fill=1)
-    ty = fy - 12.0
-    c.setFont(SANS, 5.9)
+    ty = fy - 14.0
+    c.setFont(SERIF, 6.8)
     c.setFillColor(GRAY)
     for ln in lines:
-        c.drawString(MARGIN_L + 12.0, ty, ln)
-        ty -= 7.6
+        c.drawString(MARGIN_L + 14.0, ty, ln)
+        ty -= 8.8

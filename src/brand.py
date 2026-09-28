@@ -25,13 +25,25 @@ ESPRESSO = HexColor("#3A2E24")     # dark band behind knockout logo
 WHITE = HexColor("#FFFFFF")
 
 # --- Type ---------------------------------------------------------------------
-# reportlab's bundled Helvetica reads close enough to the logo's geometric sans
-# once it is tracked out; the packet uses tracking rather than a webfont so the
-# PDF stays self-contained.
-SANS = "Helvetica"
-SANS_B = "Helvetica-Bold"
-SANS_O = "Helvetica-Oblique"
-SANS_BO = "Helvetica-BoldOblique"
+# Times throughout. The old names are kept so the rest of the packet did not
+# have to be rewritten around the change; they now point at the serif faces.
+SERIF = "Times-Roman"
+SERIF_B = "Times-Bold"
+SERIF_I = "Times-Italic"
+SERIF_BI = "Times-BoldItalic"
+
+SANS = SERIF
+SANS_B = SERIF_B
+SANS_O = SERIF_I
+SANS_BO = SERIF_BI
+
+# Times carries a smaller x-height than Helvetica, so every size steps up and
+# leading opens out to keep the page comfortable rather than cramped.
+BODY = 8.6
+BODY_LEAD = 11.6
+SMALL = 7.4
+LABEL = 6.8
+MICRO = 6.2
 
 # --- Page geometry ------------------------------------------------------------
 PAGE_W, PAGE_H = 612.0, 792.0      # US Letter
@@ -55,6 +67,14 @@ CUSTODIAN_EMAIL = "operations@digitaltrust.com"
 CUSTODIAN_ADDRESS = "7336 W. Post Rd., Suite 111, Las Vegas, NV 89113"
 
 PRESENTER_NAME = "Fortuity Inc"
+
+# --- Apex watermark -----------------------------------------------------------
+# The nested-delta mark sits behind the type on every page. Kept faint enough
+# that it never competes with the body copy, large enough to read as a
+# deliberate ground rather than a stamp.
+WATERMARK_WIDTH = 470.0      # points, on a 612pt page
+WATERMARK_ALPHA = 0.048
+WATERMARK_CENTER_Y = 372.0   # a shade below the optical centre of the block
 
 
 def alpha(color: Color, a: float) -> Color:

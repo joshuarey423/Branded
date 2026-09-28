@@ -28,6 +28,9 @@ from brand import (
     SANS_B,
     SANS_BO,
     SANS_O,
+    SERIF,
+    SERIF_B,
+    SERIF_I,
     WASH,
     WASH_GOLD,
     WHITE,
@@ -38,14 +41,14 @@ from layout import gradient_rule, tracked, tracked_width, wrap, wrap_runs
 
 SRC = os.path.join(os.path.dirname(os.path.abspath(__file__)), "source_pages.txt")
 
-BODY_SIZE = 7.0
-BODY_LEAD = 9.1
+BODY_SIZE = 8.4
+BODY_LEAD = 11.4
 TOP = PAGE_H - 88.0
 BOTTOM = 76.0
 
 MARKER_RE = re.compile(r"^(\d{1,2}\.|[a-z]\.|[ivx]{1,4}\.|[a-z]\)|\d\.\))$")
-INDENT = {0: 0.0, 1: 15.0, 2: 30.0, 3: 45.0}
-MARKER_W = {0: 15.0, 1: 14.0, 2: 15.0, 3: 16.0}
+INDENT = {0: 0.0, 1: 18.0, 2: 36.0, 3: 54.0}
+MARKER_W = {0: 18.0, 1: 17.0, 2: 18.0, 3: 19.0}
 
 
 def _pages():
@@ -225,9 +228,9 @@ def _para_lines(b, width_for_level):
     width = width_for_level(b.level, bool(b.marker))
     runs = []
     if b.runin:
-        runs.append((b.runin + "  ", SANS_B, BODY_SIZE))
+        runs.append((b.runin + "  ", SERIF_B, BODY_SIZE))
     if b.text:
-        runs.append((b.text, SANS, BODY_SIZE))
+        runs.append((b.text, SERIF, BODY_SIZE))
     if not runs:
         return []
     return wrap_runs(runs, width)
@@ -242,22 +245,22 @@ def _content_width(level, has_marker):
 
 def _table_geometry(tbl):
     cols = [CONTENT_W * 0.42, CONTENT_W * 0.31, CONTENT_W * 0.27]
-    size = 6.4
+    size = 7.6
     rows = []
     head_h = 0.0
     for cell, w in zip(tbl["head"], cols):
-        head_h = max(head_h, len(wrap(cell, SANS_B, size, w - 12.0)) * 8.4)
-    head_h += 8.0
+        head_h = max(head_h, len(wrap(cell, SERIF_B, size, w - 14.0)) * 9.8)
+    head_h += 10.0
     for row in tbl["rows"]:
         h = 0.0
         for cell, w in zip(row, cols):
             if cell:
-                h = max(h, len(wrap(cell, SANS, size, w - 12.0)) * 8.2)
-        rows.append(max(h + 6.0, 15.0))
+                h = max(h, len(wrap(cell, SERIF, size, w - 14.0)) * 9.6)
+        rows.append(max(h + 8.0, 18.0))
     return cols, size, head_h, rows
 
 
-PARA_GAP = 8.0
+PARA_GAP = 9.5
 
 
 def _para_height(n_lines):
@@ -269,44 +272,43 @@ def _para_height(n_lines):
 
 def measure(b):
     if b.kind == "heading":
-        return 28.0
+        return 32.0
     if b.kind == "table":
         cols, size, head_h, rows = _table_geometry(b.table)
         return head_h + sum(rows) + 14.0
     if b.kind == "emphasis":
-        return len(wrap(b.text, SANS_B, BODY_SIZE, CONTENT_W - 24.0)) * BODY_LEAD + 16.0
+        return len(wrap(b.text, SERIF_B, BODY_SIZE, CONTENT_W - 28.0)) * BODY_LEAD + 20.0
     return _para_height(len(_para_lines(b, _content_width)))
 
 
 def draw(c, b, y):
     if b.kind == "heading":
-        tracked(c, MARGIN_L, y - 14.0, b.text, SANS_B, 8.4, BRONZE_DEEP, 1.2)
-        c.setStrokeColor(alpha(GOLD, 0.55))
-        c.setLineWidth(0.7)
-        c.line(MARGIN_L, y - 18.5, PAGE_W - MARGIN_R, y - 18.5)
-        return y - 28.0
+        tracked(c, MARGIN_L, y - 15.0, b.text, SERIF_B, 9.4, BRONZE_DEEP, 1.6)
+        gradient_rule(c, MARGIN_L, y - 21.0, CONTENT_W, 0.7,
+                      c1=alpha(GOLD, 0.75), c2=alpha(BRONZE_DEEP, 0.3))
+        return y - 32.0
 
     if b.kind == "emphasis":
-        lines = wrap(b.text, SANS_B, BODY_SIZE, CONTENT_W - 24.0)
-        h = len(lines) * BODY_LEAD + 10.0
+        lines = wrap(b.text, SERIF_B, BODY_SIZE, CONTENT_W - 28.0)
+        h = len(lines) * BODY_LEAD + 14.0
         c.setFillColor(WASH_GOLD)
         c.rect(MARGIN_L, y - h, CONTENT_W, h, stroke=0, fill=1)
         c.setFillColor(GOLD)
         c.rect(MARGIN_L, y - h, 2.4, h, stroke=0, fill=1)
-        ty = y - 11.0
-        c.setFont(SANS_B, BODY_SIZE)
+        ty = y - 13.0
+        c.setFont(SERIF_B, BODY_SIZE)
         c.setFillColor(ESPRESSO)
         for ln in lines:
-            c.drawString(MARGIN_L + 12.0, ty, ln)
+            c.drawString(MARGIN_L + 14.0, ty, ln)
             ty -= BODY_LEAD
-        return y - h - 6.0
+        return y - h - 8.0
 
     if b.kind == "table":
         return _draw_table(c, b.table, y)
 
     x = MARGIN_L + INDENT[min(b.level, 3)]
     if b.marker:
-        c.setFont(SANS_B, BODY_SIZE)
+        c.setFont(SERIF_B, BODY_SIZE)
         c.setFillColor(BRONZE_DEEP)
         c.drawString(x, y - BODY_SIZE, b.marker)
         x += MARKER_W[min(b.level, 3)]
@@ -316,7 +318,7 @@ def draw(c, b, y):
     for line in lines:
         for text, font, size, dx in line:
             c.setFont(font, size)
-            c.setFillColor(ESPRESSO if font == SANS_B else INK_SOFT)
+            c.setFillColor(ESPRESSO if font == SERIF_B else INK_SOFT)
             c.drawString(x + dx, ty, text)
         ty -= BODY_LEAD
     return y - _para_height(len(lines))
@@ -333,12 +335,12 @@ def _draw_table(c, tbl, y):
     c.setFillColor(ESPRESSO)
     c.rect(MARGIN_L, y - head_h, CONTENT_W, head_h, stroke=0, fill=1)
     for cell, x, w in zip(tbl["head"], xs, cols):
-        ty = y - 11.0
-        c.setFont(SANS_B, size)
+        ty = y - 13.0
+        c.setFont(SERIF_B, size)
         c.setFillColor(GOLD_LIGHT)
-        for ln in wrap(cell, SANS_B, size, w - 12.0):
-            c.drawString(x + 6.0, ty, ln)
-            ty -= 8.4
+        for ln in wrap(cell, SERIF_B, size, w - 14.0):
+            c.drawString(x + 7.0, ty, ln)
+            ty -= 9.8
     cy = y - head_h
 
     for i, (row, h) in enumerate(zip(tbl["rows"], row_hs)):
@@ -348,12 +350,12 @@ def _draw_table(c, tbl, y):
         for cell, x, w in zip(row, xs, cols):
             if not cell:
                 continue
-            ty = cy - 9.0
-            c.setFont(SANS, size)
+            ty = cy - 11.5
+            c.setFont(SERIF, size)
             c.setFillColor(INK_SOFT)
-            for ln in wrap(cell, SANS, size, w - 12.0):
-                c.drawString(x + 6.0, ty, ln)
-                ty -= 8.2
+            for ln in wrap(cell, SERIF, size, w - 14.0):
+                c.drawString(x + 7.0, ty, ln)
+                ty -= 9.6
         c.setStrokeColor(RULE)
         c.setLineWidth(0.4)
         c.line(MARGIN_L, cy - h, PAGE_W - MARGIN_R, cy - h)
@@ -368,18 +370,19 @@ def _draw_table(c, tbl, y):
 # ---------------------------------------------------------------------------
 
 def _section_title(c, section, y):
-    tracked(c, MARGIN_L, y, section["title"], SANS_B, 11.5, ESPRESSO, 1.6)
-    y -= 15.0
-    tracked(c, MARGIN_L, y, section["subtitle"].upper(), SANS, 9.0, BRONZE_DEEP, 1.8)
-    y -= 14.0
-    c.setFont(SANS_O, 6.8)
+    tracked(c, MARGIN_L, y, section["title"], SERIF, 13.5, ESPRESSO, 2.0)
+    y -= 18.0
+    tracked(c, MARGIN_L, y, section["subtitle"].upper(), SERIF_B, 9.6,
+            BRONZE_DEEP, 2.2)
+    y -= 17.0
+    c.setFont(SERIF_I, 7.4)
     c.setFillColor(GRAY)
     for m in section["meta"]:
         c.drawString(MARGIN_L, y, m)
-        y -= 9.0
-    y -= 4.0
-    gradient_rule(c, MARGIN_L, y, CONTENT_W, 1.6)
-    return y - 16.0
+        y -= 10.0
+    y -= 6.0
+    gradient_rule(c, MARGIN_L, y, CONTENT_W, 1.2)
+    return y - 22.0
 
 
 class BackPage:
